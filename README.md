@@ -1,8 +1,8 @@
-# Claude Taskbar Widget
+# Taskbar Meter for Claude
 
 A tiny, unofficial Windows widget that shows your **Claude plan usage** right on the taskbar, so you can see how much of your session and weekly limits you have left without opening anything.
 
-![Claude Taskbar Widget on the Windows taskbar, with its hover tooltip open](docs/screenshot.png)
+![Taskbar Meter for Claude on the Windows taskbar, with its hover tooltip open](docs/screenshot.png)
 
 - **`5h`**: your current session limit (the rolling 5-hour window)
 - **`7d`**: your weekly limit
@@ -42,14 +42,14 @@ The widget reads the login that Claude Code already saves on your PC, so there i
 
 ## Getting started
 
-1. Download `claude-taskbar-widget.ps1` (or clone this repository).
+1. Download `taskbar-meter-for-claude.ps1` (or clone this repository).
 2. Open PowerShell in that folder and unblock the file. Windows blocks scripts downloaded from the internet.
    ```powershell
-   Unblock-File .\claude-taskbar-widget.ps1
+   Unblock-File .\taskbar-meter-for-claude.ps1
    ```
 3. Run it:
    ```powershell
-   powershell -ExecutionPolicy Bypass -File .\claude-taskbar-widget.ps1
+   powershell -ExecutionPolicy Bypass -File .\taskbar-meter-for-claude.ps1
    ```
 
 The widget appears on the left side of your taskbar. The PowerShell window hides itself, and the widget keeps running in the background.
@@ -59,8 +59,8 @@ The widget appears on the left side of your taskbar. The PowerShell window hides
 Right-click the widget and tick **Start with Windows**, or run:
 
 ```powershell
-.\claude-taskbar-widget.ps1 -Autostart On    # turn on
-.\claude-taskbar-widget.ps1 -Autostart Off   # turn off
+.\taskbar-meter-for-claude.ps1 -Autostart On    # turn on
+.\taskbar-meter-for-claude.ps1 -Autostart Off   # turn off
 ```
 
 ## Using it
@@ -82,7 +82,7 @@ That endpoint is **undocumented** and may change without notice. If the widget s
 
 - Your token is only ever sent to `api.anthropic.com`. It is never written anywhere, logged or shown.
 - The widget only reads the credentials file and never changes it.
-- The only thing it saves is the widget's position, in `%APPDATA%\ClaudeTaskbarWidget\settings.json`.
+- The only thing it saves is the widget's position, in `%APPDATA%\TaskbarMeterForClaude\settings.json`.
 - There is no telemetry, and it makes no other network requests.
 
 ## Troubleshooting
@@ -98,7 +98,7 @@ That endpoint is **undocumented** and may change without notice. If the widget s
 To see exactly what the endpoint returns (the output contains only usage numbers, never your token), run:
 
 ```powershell
-.\claude-taskbar-widget.ps1 -DumpJson
+.\taskbar-meter-for-claude.ps1 -DumpJson
 ```
 
 If the format has changed, please [open an issue](../../issues) and include that output.
@@ -110,8 +110,8 @@ If the format has changed, please [open an issue](../../issues) and include that
 ## Uninstall
 
 1. Right-click the widget and choose **Exit**.
-2. Run `.\claude-taskbar-widget.ps1 -Autostart Off` if you had turned on Start with Windows.
-3. Delete the script and the `%APPDATA%\ClaudeTaskbarWidget` folder.
+2. Run `.\taskbar-meter-for-claude.ps1 -Autostart Off` if you had turned on Start with Windows.
+3. Delete the script and the `%APPDATA%\TaskbarMeterForClaude` folder.
 
 ## License
 

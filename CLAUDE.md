@@ -32,7 +32,7 @@ This repository is **public on GitHub**. Anything committed can be seen by anyon
 - OAuth tokens, API keys, or any `sk-ant-...` value
 - `.credentials.json` or anything else from `%USERPROFILE%\.claude\`
 - Output of `-DumpJson` pasted from a real account (use made-up example numbers instead)
-- `%APPDATA%\ClaudeTaskbarWidget\settings.json` or other local settings
+- `%APPDATA%\TaskbarMeterForClaude\settings.json` or other local settings
 - Personal email addresses, usernames, real names, or machine-specific paths, except the author name already in LICENSE
 - Logs, crash dumps, `.env` files, or real screenshots that haven't been reviewed
 
@@ -40,7 +40,7 @@ This repository is **public on GitHub**. Anything committed can be seen by anyon
 
 ## Project overview
 
-`claude-taskbar-widget.ps1` is a single PowerShell script (WinForms) that draws a small borderless, always-on-top "pill" on the Windows taskbar showing Claude plan usage:
+`taskbar-meter-for-claude.ps1` is a single PowerShell script (WinForms) that draws a small borderless, always-on-top "pill" on the Windows taskbar showing Claude plan usage:
 
 - `5h`: session limit, `7d`: weekly limit, colored green (<50%), amber (>=50%), red (>=80%)
 - The tooltip shows reset times, model-specific weekly limits, and extra usage
@@ -50,7 +50,7 @@ This repository is **public on GitHub**. Anything committed can be seen by anyon
 ## Repository layout
 
 ```
-claude-taskbar-widget.ps1   the widget (the only code file)
+taskbar-meter-for-claude.ps1   the widget (the only code file)
 README.md                   user-facing docs
 LICENSE                     MIT
 docs/screenshot.png         README hero image (mockup)
@@ -72,11 +72,11 @@ There is no test suite. Before committing a code change:
 
 1. Check the syntax:
    ```powershell
-   $e = $null; [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\claude-taskbar-widget.ps1", [ref]$null, [ref]$e); $e
+   $e = $null; [void][System.Management.Automation.Language.Parser]::ParseFile("$PWD\taskbar-meter-for-claude.ps1", [ref]$null, [ref]$e); $e
    ```
 2. Run the linter, if it's available:
-   `Invoke-ScriptAnalyzer .\claude-taskbar-widget.ps1`. The plural-noun, ShouldProcess, Write-Host and empty-catch warnings are known and accepted.
-3. Check that the file is still ASCII-only: `Select-String -Path .\claude-taskbar-widget.ps1 -Pattern '[^\x00-\x7F]'` should return nothing.
+   `Invoke-ScriptAnalyzer .\taskbar-meter-for-claude.ps1`. The plural-noun, ShouldProcess, Write-Host and empty-catch warnings are known and accepted.
+3. Check that the file is still ASCII-only: `Select-String -Path .\taskbar-meter-for-claude.ps1 -Pattern '[^\x00-\x7F]'` should return nothing.
 4. Run it on Windows and check the pill, tooltip, drag, double-click and right-click menu.
 5. **Run the sensitive-data checklist above.**
 

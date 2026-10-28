@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Claude Taskbar Widget - an unofficial Windows widget that shows your Claude plan
+  Taskbar Meter for Claude - an unofficial Windows widget that shows your Claude plan
   limits (session + weekly) as a small pill on the taskbar.
 
 .DESCRIPTION
@@ -22,7 +22,7 @@
   Off = remove that.
 
 .EXAMPLE
-  powershell -ExecutionPolicy Bypass -File .\claude-taskbar-widget.ps1
+  powershell -ExecutionPolicy Bypass -File .\taskbar-meter-for-claude.ps1
 #>
 param(
   [switch]$DumpJson,
@@ -33,12 +33,12 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-if (-not ('ClaudeTaskbarWidgetNative' -as [type])) {
+if (-not ('TaskbarMeterForClaudeNative' -as [type])) {
   Add-Type @"
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
-public static class ClaudeTaskbarWidgetNative {
+public static class TaskbarMeterForClaudeNative {
   [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
   [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
   [DllImport("user32.dll")] public static extern bool ReleaseCapture();
@@ -74,9 +74,9 @@ public static class ClaudeTaskbarWidgetNative {
 }
 
 # ---------------------------------------------------------------- settings ---
-$script:CfgDir  = Join-Path $env:APPDATA 'ClaudeTaskbarWidget'
+$script:CfgDir  = Join-Path $env:APPDATA 'TaskbarMeterForClaude'
 $script:CfgFile = Join-Path $script:CfgDir 'settings.json'
-$script:StartupLnk = Join-Path ([Environment]::GetFolderPath('Startup')) 'Claude Taskbar Widget.lnk'
+$script:StartupLnk = Join-Path ([Environment]::GetFolderPath('Startup')) 'Taskbar Meter for Claude.lnk'
 
 function Read-Settings {
   $s = [pscustomobject]@{ X = $null; Y = $null; Locked = $false }
@@ -106,7 +106,7 @@ function Set-Autostart([bool]$On) {
     $lnk.Arguments = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`""
     $lnk.WorkingDirectory = Split-Path $PSCommandPath
     $lnk.WindowStyle = 7   # minimized
-    $lnk.Description = 'Claude Taskbar Widget'
+    $lnk.Description = 'Taskbar Meter for Claude'
     $lnk.Save()
   } else {
     Remove-Item $script:StartupLnk -ErrorAction SilentlyContinue
@@ -128,7 +128,7 @@ function Invoke-UsageApi {
   $headers = @{
     'Authorization'  = "Bearer $(Get-ClaudeToken)"
     'anthropic-beta' = 'oauth-2025-04-20'
-    'User-Agent'     = 'claude-taskbar-widget/1.0'
+    'User-Agent'     = 'taskbar-meter-for-claude/1.0'
   }
   Invoke-RestMethod -Uri 'https://api.anthropic.com/api/oauth/usage' -Headers $headers -Method Get -TimeoutSec 12
 }
@@ -214,14 +214,14 @@ if ($Autostart) {
 
 # ---------------------------------------------------------- single instance ---
 $created = $false
-$script:Mutex = New-Object System.Threading.Mutex($true, 'Local\ClaudeTaskbarWidget', [ref]$created)
+$script:Mutex = New-Object System.Threading.Mutex($true, 'Local\TaskbarMeterForClaude', [ref]$created)
 if (-not $created) { return }
 
 # Hide the console window this script was started from.
-$console = [ClaudeTaskbarWidgetNative]::GetConsoleWindow()
-if ($console -ne [IntPtr]::Zero) { [void][ClaudeTaskbarWidgetNative]::ShowWindow($console, 0) }
+$console = [TaskbarMeterForClaudeNative]::GetConsoleWindow()
+if ($console -ne [IntPtr]::Zero) { [void][TaskbarMeterForClaudeNative]::ShowWindow($console, 0) }
 
-[void][ClaudeTaskbarWidgetNative]::SetProcessDPIAware()
+[void][TaskbarMeterForClaudeNative]::SetProcessDPIAware()
 [Windows.Forms.Application]::EnableVisualStyles()
 
 $g0 = [Drawing.Graphics]::FromHwnd([IntPtr]::Zero)
@@ -410,7 +410,7 @@ function Set-InitialPosition {
 # ------------------------------------------------------------------- form ---
 $form = New-Object Windows.Forms.Form
 $script:Form = $form
-$form.Text = 'Claude Taskbar Widget'
+$form.Text = 'Taskbar Meter for Claude'
 $form.FormBorderStyle = 'None'
 $form.MaximizeBox = $false   # otherwise a double-click on the drag area maximizes the pill
 $form.MinimizeBox = $false
@@ -466,8 +466,8 @@ $form.Add_MouseDown({
   if ($e.Button -ne [Windows.Forms.MouseButtons]::Left) { return }
   if ($e.Clicks -ge 2) { Start-Process 'https://claude.ai/settings/usage'; return }
   if (-not $script:Settings.Locked) {
-    [void][ClaudeTaskbarWidgetNative]::ReleaseCapture()
-    [void][ClaudeTaskbarWidgetNative]::SendMessage($script:Form.Handle, 0xA1, 2, 0)   # WM_NCLBUTTONDOWN, HTCAPTION
+    [void][TaskbarMeterForClaudeNative]::ReleaseCapture()
+    [void][TaskbarMeterForClaudeNative]::SendMessage($script:Form.Handle, 0xA1, 2, 0)   # WM_NCLBUTTONDOWN, HTCAPTION
     $script:Settings.X = $script:Form.Left
     $script:Settings.Y = $script:Form.Top
     Save-Settings
@@ -503,13 +503,13 @@ $topTimer.Interval = 1000
 $topTimer.Add_Tick({
   $f = $script:Form
   $scr = [Windows.Forms.Screen]::FromControl($f).Bounds
-  $full = [ClaudeTaskbarWidgetNative]::ForegroundIsFullscreen($scr.Left, $scr.Top, $scr.Right, $scr.Bottom, $f.Handle)
+  $full = [TaskbarMeterForClaudeNative]::ForegroundIsFullscreen($scr.Left, $scr.Top, $scr.Right, $scr.Bottom, $f.Handle)
   if ($full) {
-    if (-not $script:HiddenForFullscreen) { [void][ClaudeTaskbarWidgetNative]::ShowWindow($f.Handle, 0); $script:HiddenForFullscreen = $true }   # SW_HIDE
+    if (-not $script:HiddenForFullscreen) { [void][TaskbarMeterForClaudeNative]::ShowWindow($f.Handle, 0); $script:HiddenForFullscreen = $true }   # SW_HIDE
   } else {
     # SW_SHOWNOACTIVATE: reappear without stealing focus from the app you're using
-    if ($script:HiddenForFullscreen) { [void][ClaudeTaskbarWidgetNative]::ShowWindow($f.Handle, 4); $script:HiddenForFullscreen = $false }
-    [ClaudeTaskbarWidgetNative]::KeepOnTop($f.Handle)
+    if ($script:HiddenForFullscreen) { [void][TaskbarMeterForClaudeNative]::ShowWindow($f.Handle, 4); $script:HiddenForFullscreen = $false }
+    [TaskbarMeterForClaudeNative]::KeepOnTop($f.Handle)
   }
 })
 
