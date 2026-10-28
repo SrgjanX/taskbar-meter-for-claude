@@ -1,0 +1,17 @@
+# Never commit credentials or local state (this is a public repo)
+.credentials.json
+credentials*.json
+settings.json
+*.env
+.env*
+*.log
+*.dmp
+dump*.json
+usage*.json
+
+# OS / editor clutter
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
